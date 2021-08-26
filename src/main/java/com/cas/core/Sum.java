@@ -28,16 +28,6 @@ public class Sum extends Operator {
     }
 
     /**
-     * sort the children in reverse
-     */
-    private void reverseSortChildren() {
-        Arrays.sort(children, ExpressionSorter.DEFAULT);
-        List<Expression> reversed = Arrays.asList(children);
-        Collections.reverse(reversed);
-        children = reversed.toArray(children);
-    }
-
-    /**
      * function to create an expression node with the given children as strings,
      * they still need to be parsed. The point of this function is to perform early
      * refactoring to make life easier later on. It does not have to return a sum
@@ -143,7 +133,7 @@ public class Sum extends Operator {
         for (int i = valid.size() - 1; i >= 0; i--) {
             Expression expression = valid.get(i);
             if (expression instanceof Product) {
-                products.add((Product) expression);
+                products.add(expression);
                 valid.remove(i);
             }
         }
@@ -186,6 +176,16 @@ public class Sum extends Operator {
 
         // final expression
         return new Sum(grouped.toArray(new Expression[0]));
+    }
+
+    /**
+     * sort the children in reverse
+     */
+    private void reverseSortChildren() {
+        Arrays.sort(children, ExpressionSorter.DEFAULT);
+        List<Expression> reversed = Arrays.asList(children);
+        Collections.reverse(reversed);
+        children = reversed.toArray(children);
     }
 
     @Override

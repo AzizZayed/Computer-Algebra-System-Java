@@ -11,8 +11,8 @@ import java.util.HashSet;
  */
 public class Equation implements IMath {
 
-    private Expression root;
-    private HashSet<Character> variables;
+    private final Expression root;
+    private final HashSet<Character> variables;
 
     public Equation(Expression root, HashSet<Character> variables) {
         this.root = root;

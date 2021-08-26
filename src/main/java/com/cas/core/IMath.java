@@ -10,14 +10,14 @@ public interface IMath {
     /**
      * @return the latex code for the mathematical expression
      */
-    public String toLatex();
+    String toLatex();
 
     /**
      * @return a fancy string representation of the mathematical expression. This
      * function uses Unicode when possible
      */
-    public String toFancyString();
+    String toFancyString();
 
     @Override
-    public String toString();
+    String toString();
 }

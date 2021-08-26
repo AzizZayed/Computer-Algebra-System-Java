@@ -9,12 +9,9 @@ import com.cas.rendering.plots.Plot;
 import com.cas.rendering.plots.Surface;
 import com.cas.rendering.plots.SurfaceTrio;
 import com.cas.rendering.util.Grid;
-import imgui.type.ImDouble;
-import imgui.type.ImFloat;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
-import imgui.type.ImString;
 import imgui.ImVec2;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
@@ -29,72 +26,17 @@ import imgui.flag.ImGuiMouseCursor;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
+import imgui.type.ImDouble;
+import imgui.type.ImFloat;
+import imgui.type.ImString;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import static org.lwjgl.glfw.GLFW.GLFW_ARROW_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
-import static org.lwjgl.glfw.GLFW.GLFW_HAND_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_HRESIZE_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_IBEAM_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_END;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_HOME;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_INSERT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SUPER;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_ALT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SHIFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SUPER;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_TAB;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_V;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_Y;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_3;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_4;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_5;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.GLFW_VRESIZE_CURSOR;
-import static org.lwjgl.glfw.GLFW.glfwCreateStandardCursor;
-import static org.lwjgl.glfw.GLFW.glfwDestroyCursor;
-import static org.lwjgl.glfw.GLFW.glfwGetClipboardString;
-import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
-import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetClipboardString;
-import static org.lwjgl.glfw.GLFW.glfwSetCursor;
-import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 
 /**
  * class to render ImGui using the java bindings. Most of the setup code is
@@ -108,33 +50,29 @@ import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
  */
 public class GUIRenderer {
 
+    private static final GUIRenderer instance = new GUIRenderer(); // singleton instance
     private final ImGuiImplGl3 imGui = new ImGuiImplGl3(); // OpenGL ImGui context
-    private static GUIRenderer instance = new GUIRenderer(); // singleton instance
-
     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT]; // Mouse cursors provided by GLFW
 
-    private ImString strFunction2 = new ImString("x^2", 500); // string object to record 2D input
-    private ImString strFunction3 = new ImString("sin(x*y)", 500); // string object to record 2D input
-
+    private final ImString strFunction2 = new ImString("x^2", 500); // string object to record 2D input
+    private final ImString strFunction3 = new ImString("sin(x*y)", 500); // string object to record 2D input
+    private final HashMap<Character, Float> sliderSteps2D = new HashMap<>(); // the incrementation values for each slider 2D
+    private final HashMap<Character, Float> sliderSteps3D = new HashMap<>(); // the incrementation values for each slider 3D
     private String errorMessage = ""; // the error message that appreas when there is an error
-
-    private HashMap<Character, Float> sliderSteps2D = new HashMap<>(); // the incrementation values for each slider 2D
-    private HashMap<Character, Float> sliderSteps3D = new HashMap<>(); // the incrementation values for each slider 3D
-
     private ImVec2 mouseDrag = new ImVec2(0f, 0f); // the vector describing the mouse drag
     private float scroll = 0f; // mouse wheel scroll delta
+
+    /**
+     * make constructor private for singleton
+     */
+    private GUIRenderer() {
+    }
 
     /**
      * @return the only GUIRenderer instance
      */
     public static GUIRenderer getContext() {
         return instance;
-    }
-
-    /**
-     * make constructor private for singleton
-     */
-    private GUIRenderer() {
     }
 
     /**
@@ -158,72 +96,72 @@ public class GUIRenderer {
         // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[]
         // array.
         final int[] keyMap = new int[ImGuiKey.COUNT];
-        keyMap[ImGuiKey.Tab] = GLFW_KEY_TAB;
-        keyMap[ImGuiKey.LeftArrow] = GLFW_KEY_LEFT;
-        keyMap[ImGuiKey.RightArrow] = GLFW_KEY_RIGHT;
-        keyMap[ImGuiKey.UpArrow] = GLFW_KEY_UP;
-        keyMap[ImGuiKey.DownArrow] = GLFW_KEY_DOWN;
-        keyMap[ImGuiKey.PageUp] = GLFW_KEY_PAGE_UP;
-        keyMap[ImGuiKey.PageDown] = GLFW_KEY_PAGE_DOWN;
-        keyMap[ImGuiKey.Home] = GLFW_KEY_HOME;
-        keyMap[ImGuiKey.End] = GLFW_KEY_END;
-        keyMap[ImGuiKey.Insert] = GLFW_KEY_INSERT;
-        keyMap[ImGuiKey.Delete] = GLFW_KEY_DELETE;
-        keyMap[ImGuiKey.Backspace] = GLFW_KEY_BACKSPACE;
-        keyMap[ImGuiKey.Space] = GLFW_KEY_SPACE;
-        keyMap[ImGuiKey.Enter] = GLFW_KEY_ENTER;
-        keyMap[ImGuiKey.Escape] = GLFW_KEY_ESCAPE;
-        keyMap[ImGuiKey.KeyPadEnter] = GLFW_KEY_KP_ENTER;
-        keyMap[ImGuiKey.A] = GLFW_KEY_A;
-        keyMap[ImGuiKey.C] = GLFW_KEY_C;
-        keyMap[ImGuiKey.V] = GLFW_KEY_V;
-        keyMap[ImGuiKey.X] = GLFW_KEY_X;
-        keyMap[ImGuiKey.Y] = GLFW_KEY_Y;
-        keyMap[ImGuiKey.Z] = GLFW_KEY_Z;
+        keyMap[ImGuiKey.Tab] = GLFW.GLFW_KEY_TAB;
+        keyMap[ImGuiKey.LeftArrow] = GLFW.GLFW_KEY_LEFT;
+        keyMap[ImGuiKey.RightArrow] = GLFW.GLFW_KEY_RIGHT;
+        keyMap[ImGuiKey.UpArrow] = GLFW.GLFW_KEY_UP;
+        keyMap[ImGuiKey.DownArrow] = GLFW.GLFW_KEY_DOWN;
+        keyMap[ImGuiKey.PageUp] = GLFW.GLFW_KEY_PAGE_UP;
+        keyMap[ImGuiKey.PageDown] = GLFW.GLFW_KEY_PAGE_DOWN;
+        keyMap[ImGuiKey.Home] = GLFW.GLFW_KEY_HOME;
+        keyMap[ImGuiKey.End] = GLFW.GLFW_KEY_END;
+        keyMap[ImGuiKey.Insert] = GLFW.GLFW_KEY_INSERT;
+        keyMap[ImGuiKey.Delete] = GLFW.GLFW_KEY_DELETE;
+        keyMap[ImGuiKey.Backspace] = GLFW.GLFW_KEY_BACKSPACE;
+        keyMap[ImGuiKey.Space] = GLFW.GLFW_KEY_SPACE;
+        keyMap[ImGuiKey.Enter] = GLFW.GLFW_KEY_ENTER;
+        keyMap[ImGuiKey.Escape] = GLFW.GLFW_KEY_ESCAPE;
+        keyMap[ImGuiKey.KeyPadEnter] = GLFW.GLFW_KEY_KP_ENTER;
+        keyMap[ImGuiKey.A] = GLFW.GLFW_KEY_A;
+        keyMap[ImGuiKey.C] = GLFW.GLFW_KEY_C;
+        keyMap[ImGuiKey.V] = GLFW.GLFW_KEY_V;
+        keyMap[ImGuiKey.X] = GLFW.GLFW_KEY_X;
+        keyMap[ImGuiKey.Y] = GLFW.GLFW_KEY_Y;
+        keyMap[ImGuiKey.Z] = GLFW.GLFW_KEY_Z;
         io.setKeyMap(keyMap);
 
         // ------------------------------------------------------------
         // Mouse cursors mapping
-        mouseCursors[ImGuiMouseCursor.Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-        mouseCursors[ImGuiMouseCursor.TextInput] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
-        mouseCursors[ImGuiMouseCursor.ResizeAll] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-        mouseCursors[ImGuiMouseCursor.ResizeNS] = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
-        mouseCursors[ImGuiMouseCursor.ResizeEW] = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
-        mouseCursors[ImGuiMouseCursor.ResizeNESW] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-        mouseCursors[ImGuiMouseCursor.ResizeNWSE] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-        mouseCursors[ImGuiMouseCursor.Hand] = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
-        mouseCursors[ImGuiMouseCursor.NotAllowed] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+        mouseCursors[ImGuiMouseCursor.Arrow] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR);
+        mouseCursors[ImGuiMouseCursor.TextInput] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR);
+        mouseCursors[ImGuiMouseCursor.ResizeAll] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR);
+        mouseCursors[ImGuiMouseCursor.ResizeNS] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_VRESIZE_CURSOR);
+        mouseCursors[ImGuiMouseCursor.ResizeEW] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR);
+        mouseCursors[ImGuiMouseCursor.ResizeNESW] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR);
+        mouseCursors[ImGuiMouseCursor.ResizeNWSE] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR);
+        mouseCursors[ImGuiMouseCursor.Hand] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR);
+        mouseCursors[ImGuiMouseCursor.NotAllowed] = GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR);
 
         // ------------------------------------------------------------
         // GLFW callbacks to handle user input
 
-        glfwSetKeyCallback(windowPtr, (w, key, scancode, action, mods) -> {
-            if (action == GLFW_PRESS) {
+        GLFW.glfwSetKeyCallback(windowPtr, (w, key, scancode, action, mods) -> {
+            if (action == GLFW.GLFW_PRESS) {
                 io.setKeysDown(key, true);
-            } else if (action == GLFW_RELEASE) {
+            } else if (action == GLFW.GLFW_RELEASE) {
                 io.setKeysDown(key, false);
             }
 
-            io.setKeyCtrl(io.getKeysDown(GLFW_KEY_LEFT_CONTROL) || io.getKeysDown(GLFW_KEY_RIGHT_CONTROL));
-            io.setKeyShift(io.getKeysDown(GLFW_KEY_LEFT_SHIFT) || io.getKeysDown(GLFW_KEY_RIGHT_SHIFT));
-            io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
-            io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
+            io.setKeyCtrl(io.getKeysDown(GLFW.GLFW_KEY_LEFT_CONTROL) || io.getKeysDown(GLFW.GLFW_KEY_RIGHT_CONTROL));
+            io.setKeyShift(io.getKeysDown(GLFW.GLFW_KEY_LEFT_SHIFT) || io.getKeysDown(GLFW.GLFW_KEY_RIGHT_SHIFT));
+            io.setKeyAlt(io.getKeysDown(GLFW.GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW.GLFW_KEY_RIGHT_ALT));
+            io.setKeySuper(io.getKeysDown(GLFW.GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW.GLFW_KEY_RIGHT_SUPER));
         });
 
-        glfwSetCharCallback(windowPtr, (w, c) -> {
-            if (c != GLFW_KEY_DELETE) {
+        GLFW.glfwSetCharCallback(windowPtr, (w, c) -> {
+            if (c != GLFW.GLFW_KEY_DELETE) {
                 io.addInputCharacter(c);
             }
         });
 
-        glfwSetMouseButtonCallback(windowPtr, (w, button, action, mods) -> {
+        GLFW.glfwSetMouseButtonCallback(windowPtr, (w, button, action, mods) -> {
             final boolean[] mouseDown = new boolean[5];
 
-            mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
-            mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE;
-            mouseDown[2] = button == GLFW_MOUSE_BUTTON_3 && action != GLFW_RELEASE;
-            mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
-            mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
+            mouseDown[0] = button == GLFW.GLFW_MOUSE_BUTTON_1 && action != GLFW.GLFW_RELEASE;
+            mouseDown[1] = button == GLFW.GLFW_MOUSE_BUTTON_2 && action != GLFW.GLFW_RELEASE;
+            mouseDown[2] = button == GLFW.GLFW_MOUSE_BUTTON_3 && action != GLFW.GLFW_RELEASE;
+            mouseDown[3] = button == GLFW.GLFW_MOUSE_BUTTON_4 && action != GLFW.GLFW_RELEASE;
+            mouseDown[4] = button == GLFW.GLFW_MOUSE_BUTTON_5 && action != GLFW.GLFW_RELEASE;
 
             io.setMouseDown(mouseDown);
 
@@ -233,7 +171,7 @@ public class GUIRenderer {
 
         });
 
-        glfwSetScrollCallback(windowPtr, (w, xOffset, yOffset) -> {
+        GLFW.glfwSetScrollCallback(windowPtr, (w, xOffset, yOffset) -> {
             io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
         });
@@ -241,14 +179,14 @@ public class GUIRenderer {
         io.setSetClipboardTextFn(new ImStrConsumer() {
             @Override
             public void accept(final String s) {
-                glfwSetClipboardString(windowPtr, s);
+                GLFW.glfwSetClipboardString(windowPtr, s);
             }
         });
 
         io.setGetClipboardTextFn(new ImStrSupplier() {
             @Override
             public String get() {
-                final String clipboardString = glfwGetClipboardString(windowPtr);
+                final String clipboardString = GLFW.glfwGetClipboardString(windowPtr);
                 if (clipboardString != null) {
                     return clipboardString;
                 } else {
@@ -276,14 +214,14 @@ public class GUIRenderer {
      */
     private void startFrame(final float deltaTime) {
         final ImGuiIO io = ImGui.getIO();
-        io.setDisplaySize(Display.bufferWidth(),  Display.bufferHeight());
+        io.setDisplaySize(Display.bufferWidth(), Display.bufferHeight());
         io.setDeltaTime(deltaTime);
         io.setMousePos(Display.xMouse() * Display.xScale(), Display.yMouse() * Display.yScale());
 
         // Update the mouse cursor
         final int imguiCursor = ImGui.getMouseCursor();
-        glfwSetCursor(Display.id(), mouseCursors[imguiCursor]);
-        glfwSetInputMode(Display.id(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        GLFW.glfwSetCursor(Display.id(), mouseCursors[imguiCursor]);
+        GLFW.glfwSetInputMode(Display.id(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
 
     }
 
@@ -648,7 +586,7 @@ public class GUIRenderer {
         ImGui.destroyContext();
 
         for (long mouseCursor : mouseCursors) {
-            glfwDestroyCursor(mouseCursor);
+            GLFW.glfwDestroyCursor(mouseCursor);
         }
     }
 }

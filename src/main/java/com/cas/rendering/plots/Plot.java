@@ -4,20 +4,10 @@ import com.cas.core.Equation;
 import com.cas.rendering.gui.Texture;
 import com.cas.rendering.util.Grid;
 import net.jafama.FastMath;
+import org.lwjgl.opengl.GL15;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
-import static org.lwjgl.opengl.GL11.glColor4d;
-import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnableClientState;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
 
 /**
  * This class represents a plot and all the data common between all types of
@@ -27,12 +17,12 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
  */
 public abstract class Plot {
 
+    private final float[] color; // the color of the plot
+    private final Texture texture; // the texture for the equation of the plot
+    private final int vertexCount; // the number of coorfinates each vertex
     protected Equation equation; // the function of the plot
-    private float[] color; // the color of the plot
-    private Texture texture; // the texture for the equation of the plot
     protected boolean visible; // if the plot is visible
     protected int vbo; // the GPU buffer to carry the data
-    private int vertexCount; // the number of coorfinates each vertex
 
     /*
      * constructor
@@ -43,7 +33,7 @@ public abstract class Plot {
         texture = new Texture(image);
         this.vertexCount = vertexCount;
         this.visible = visible;
-        vbo = glGenBuffers();
+        vbo = GL15.glGenBuffers();
     }
 
     /**
@@ -85,7 +75,7 @@ public abstract class Plot {
      * cleanup the memory allocated by OpenGL
      */
     public void cleanup() {
-        glDeleteBuffers(vbo);
+        GL15.glDeleteBuffers(vbo);
         texture.cleanup();
     }
 
@@ -93,13 +83,13 @@ public abstract class Plot {
      * preparation to render the plot and unbinding afterwards
      */
     public void render() {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glVertexPointer(vertexCount, GL_FLOAT, 0, 0);
-        glColor4d(color[0], color[1], color[2], color[3]);
+        GL15.glEnableClientState(GL15.GL_VERTEX_ARRAY);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glVertexPointer(vertexCount, GL15.GL_FLOAT, 0, 0);
+        GL15.glColor4d(color[0], color[1], color[2], color[3]);
         drawModel();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisableClientState(GL_VERTEX_ARRAY);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glDisableClientState(GL15.GL_VERTEX_ARRAY);
     }
 
     /**

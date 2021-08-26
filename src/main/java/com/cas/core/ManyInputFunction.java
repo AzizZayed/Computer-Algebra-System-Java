@@ -109,7 +109,7 @@ public abstract class ManyInputFunction extends Expression {
      * @return a constant node with the result, null if the operation is impossible
      */
     protected Constant evaluate() {
-        double result[] = new double[children.length];
+        double[] result = new double[children.length];
         for (int i = 0; i < children.length; i++)
             if (children[i] instanceof Constant)
                 result[i] = ((Constant) children[i]).getValue();
@@ -134,7 +134,7 @@ public abstract class ManyInputFunction extends Expression {
             }
         if (nConstants < 2)
             return null;
-        double result[] = new double[resultList.size()];
+        double[] result = new double[resultList.size()];
         for (int i = 0; i < result.length; i++)
             result[i] = resultList.get(i);
         return new Constant(compute(result));

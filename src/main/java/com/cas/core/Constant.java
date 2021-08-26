@@ -16,7 +16,7 @@ public final class Constant extends Expression {
     public static final Constant EXP = new Constant(2.718281828459045d); // Euler's number
     public static final Constant GOLDEN_RATIO = new Constant(1.618033988749895d); // phi constant
 
-    private double value; // the value of the constant
+    private final double value; // the value of the constant
 
     public Constant(double val) {
         super(ExpressionType.CONSTANT);

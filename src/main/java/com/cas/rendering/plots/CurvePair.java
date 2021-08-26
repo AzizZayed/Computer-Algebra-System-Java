@@ -13,7 +13,8 @@ import java.util.HashMap;
  */
 public class CurvePair {
 
-    private Curve function, derivative; // the function and its derivative
+    private final Curve function;
+    private Curve derivative; // the function and its derivative
 
     public CurvePair(Equation eq) {
         String latex = "y = " + eq.toLatex();

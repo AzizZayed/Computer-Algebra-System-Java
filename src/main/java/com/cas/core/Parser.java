@@ -232,7 +232,7 @@ public class Parser {
                 return new Log(generateExpression(remove.pop(), vars));
             else if (cut.equals("ln()")) // natural logarithm
                 return new Ln(generateExpression(remove.pop(), vars));
-            else if (cut.substring(0, 4).equals("log_")) { // log with specified base
+            else if (cut.startsWith("log_")) { // log with specified base
                 String log = cut.substring(4);
                 int sign = log.indexOf('_');
                 String base = log.substring(0, sign);
@@ -280,46 +280,46 @@ public class Parser {
             if (base.equals("e"))
                 return new Exp(generateExpression(power, vars));
             return new Power(generateExpression(base, vars), generateExpression(power, vars));
-        } else if (strExp.substring(0, 2).equals("ln")) // natural log
+        } else if (strExp.startsWith("ln")) // natural log
             return new Ln(generateExpression(strExp.substring(2), vars));
 
-        else if (strExp.substring(0, 3).equals("sin")) // sin
+        else if (strExp.startsWith("sin")) // sin
             return new Sin(generateExpression(strExp.substring(3), vars));
-        else if (strExp.substring(0, 3).equals("cos")) // cos
+        else if (strExp.startsWith("cos")) // cos
             return new Cos(generateExpression(strExp.substring(3), vars));
-        else if (strExp.substring(0, 3).equals("tan")) // tan
+        else if (strExp.startsWith("tan")) // tan
             return new Tan(generateExpression(strExp.substring(3), vars));
 
-        else if (strExp.substring(0, 3).equals("csc")) // csc
+        else if (strExp.startsWith("csc")) // csc
             return new Csc(generateExpression(strExp.substring(3), vars));
-        else if (strExp.substring(0, 3).equals("sec")) // sec
+        else if (strExp.startsWith("sec")) // sec
             return new Sec(generateExpression(strExp.substring(3), vars));
-        else if (strExp.substring(0, 3).equals("cot")) // cot
+        else if (strExp.startsWith("cot")) // cot
             return new Cot(generateExpression(strExp.substring(3), vars));
 
-        else if (strExp.substring(0, 3).equals("abs")) // absolute value
+        else if (strExp.startsWith("abs")) // absolute value
             return new Abs(generateExpression(strExp.substring(3), vars));
 
-        else if (strExp.substring(0, 3).equals("log") && strExp.length() <= 4) // log
+        else if (strExp.startsWith("log") && strExp.length() <= 4) // log
             return new Log(generateExpression(strExp.substring(3), vars));
-        else if (strExp.substring(0, 4).equals("log_")) { // log where brackets are not needed
+        else if (strExp.startsWith("log_")) { // log where brackets are not needed
             int sign = strExp.substring(4).indexOf('_') + 4;
             String base = strExp.substring(4, sign);
             String num = strExp.substring(sign + 1);
             return new Log(generateExpression(base, vars), generateExpression(num, vars));
 
-        } else if (strExp.substring(0, 4).equals("ceil")) // ceiling function
+        } else if (strExp.startsWith("ceil")) // ceiling function
             return new Ceiling(generateExpression(strExp.substring(4), vars));
-        else if (strExp.substring(0, 4).equals("sqrt")) // sqrt function
+        else if (strExp.startsWith("sqrt")) // sqrt function
             return new Power(generateExpression(strExp.substring(4), vars), new Constant(0.5d));
-        else if (strExp.substring(0, 5).equals("floor")) // floor function
+        else if (strExp.startsWith("floor")) // floor function
             return new Floor(generateExpression(strExp.substring(5), vars));
 
-        else if (strExp.substring(0, 6).equals("arcsin")) // arcsin
+        else if (strExp.startsWith("arcsin")) // arcsin
             return new ArcSin(generateExpression(strExp.substring(6), vars));
-        else if (strExp.substring(0, 6).equals("arccos")) // arccos
+        else if (strExp.startsWith("arccos")) // arccos
             return new ArcCos(generateExpression(strExp.substring(6), vars));
-        else if (strExp.substring(0, 6).equals("arctan")) // arctan
+        else if (strExp.startsWith("arctan")) // arctan
             return new ArcTan(generateExpression(strExp.substring(6), vars));
 
         return null;
@@ -378,10 +378,7 @@ public class Parser {
             return false;
 
         // test undefined duplicates
-        if (exp.contains("//") || exp.contains("^^") || exp.contains("**") || exp.contains("++") || exp.contains("--"))
-            return false;
-
-        return true;
+        return !exp.contains("//") && !exp.contains("^^") && !exp.contains("**") && !exp.contains("++") && !exp.contains("--");
     }
 
     /**

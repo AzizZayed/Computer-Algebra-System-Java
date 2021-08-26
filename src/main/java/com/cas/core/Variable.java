@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 public final class Variable extends Expression {
 
-    private char symbol; // variable character
+    private final char symbol; // variable character
 
     public Variable(char sym) {
         super(ExpressionType.VARIABLE);

@@ -14,7 +14,8 @@ import java.util.HashMap;
  */
 public abstract class BracketFunction extends FixedInputFunction {
 
-    private char open, closed; // open and close brackets for visual purposes
+    private final char open;
+    private final char closed; // open and close brackets for visual purposes
 
     /**
      * constructor for different open and close brackets

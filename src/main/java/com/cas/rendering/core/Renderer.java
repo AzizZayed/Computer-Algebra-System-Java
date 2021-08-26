@@ -5,39 +5,11 @@ import com.cas.rendering.plots.CurvePair;
 import com.cas.rendering.plots.SurfaceTrio;
 import com.cas.rendering.util.Grid;
 import net.jafama.FastMath;
-import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glClearDepth;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glMultMatrixd;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotated;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 /**
  * This is the core of the application, where everything meets. This class is in
@@ -55,15 +27,6 @@ public class Renderer {
 
     private static Mode mode = Mode.RENDER_3D; // Current graphing mode
 
-    /**
-     * the rendering mode, 3D or 2D
-     *
-     * @author Abd-El-Aziz Zayed
-     */
-    private enum Mode {
-        RENDER_2D, RENDER_3D
-    }
-
     public Renderer() {
         Display.initialize();
         start();
@@ -74,8 +37,8 @@ public class Renderer {
      * switch between 2D and 3D
      */
     public static void switchMode() {
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
         switch (mode) {
             case RENDER_2D:
                 mode = Mode.RENDER_3D;
@@ -83,10 +46,30 @@ public class Renderer {
                 break;
             case RENDER_3D:
                 mode = Mode.RENDER_2D;
-                glOrtho(0, 1, 0, 1, -1, 1);
+                GL11.glOrtho(0, 1, 0, 1, -1, 1);
                 break;
         }
-        glMatrixMode(GL_MODELVIEW);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    }
+
+    /**
+     * Generate perspective view. Took this from the description here:
+     * https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
+     *
+     * @param fovy   - field of view angle, in degrees, in the y direction.
+     * @param aspect - aspect ratio of window
+     * @param zNear  - distance from the viewer to the near clipping plane
+     * @param zFar   - distance from the viewer to the far clipping plane
+     */
+    private static void perspective(double fovy, double aspect, double zNear, double zFar) {
+        double f = 1.0d / FastMath.tan(fovy * Math.PI / 360d);
+        double[] transformation = { //
+                f / aspect, 0, 0, 0, //
+                0, f, 0, 0, //
+                0, 0, (zFar + zNear) / (zNear - zFar), -1, //
+                0, 0, 2 * zFar * zNear / (zNear - zFar), 0 //
+        };
+        GL11.glMultMatrixd(transformation);
     }
 
     /**
@@ -94,22 +77,22 @@ public class Renderer {
      */
     public void start() {
 
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
         perspective(FOV, ASPECT, NEAR_PLANE, FAR_PLANE);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClearDepth(1.0f);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
+        GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GL11.glClearDepth(1.0f);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        glEnable(GL_MULTISAMPLE);
+        GL11.glEnable(GL13.GL_MULTISAMPLE);
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
 
 
         ArrayList<CurvePair> curves = new ArrayList<>();
@@ -131,9 +114,9 @@ public class Renderer {
             double deltaTime = (time > 0) ? (currentTime - time) : 1f / 60f;
             time = currentTime;
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-            glPushMatrix();
+            GL11.glPushMatrix();
             if (mode == Mode.RENDER_3D) {
                 input3D(gui, grid3D);
                 render3D(surfaces, grid3D, varValues3D);
@@ -143,7 +126,7 @@ public class Renderer {
                 render2D(curves, grid2D, varValues2D);
                 gui.render2D(deltaTime, curves, varValues2D, grid2D);
             }
-            glPopMatrix();
+            GL11.glPopMatrix();
 
             Display.update();
         }
@@ -164,10 +147,10 @@ public class Renderer {
     private void render3D(ArrayList<SurfaceTrio> surfaces, Grid grid, HashMap<Character, Double> varValues) {
         transform3D(grid);
 
-        glLineWidth(1f);
+        GL11.glLineWidth(1f);
         grid.render();
 
-        glLineWidth(0.8f);
+        GL11.glLineWidth(0.8f);
         for (SurfaceTrio trio : surfaces)
             trio.update(grid, varValues);
     }
@@ -182,10 +165,10 @@ public class Renderer {
     private void render2D(ArrayList<CurvePair> curves, Grid grid, HashMap<Character, Double> varValues) {
         transform2D(grid);
 
-        glLineWidth(1f);
+        GL11.glLineWidth(1f);
         grid.render();
 
-        glLineWidth(3f);
+        GL11.glLineWidth(3f);
         /// Render Curves ///
         for (CurvePair pair : curves)
             pair.update(grid, varValues);
@@ -197,14 +180,14 @@ public class Renderer {
      * @param grid
      */
     private void transform3D(Grid grid) {
-        glTranslatef(0.0f, 0.0f, -15.0f);
-        glRotatef(-75f, 1f, 0f, 0f);
+        GL11.glTranslatef(0.0f, 0.0f, -15.0f);
+        GL11.glRotatef(-75f, 1f, 0f, 0f);
 
-        glRotated(grid.getXRotation(), 1d, 0d, 0d);
-        glRotated(grid.getZRotation(), 0d, 0d, 1d);
+        GL11.glRotated(grid.getXRotation(), 1d, 0d, 0d);
+        GL11.glRotated(grid.getZRotation(), 0d, 0d, 1d);
 
         float scale = 8.0f;
-        glScaled(scale / grid.getX().getLength(), scale / grid.getY().getLength(), scale / grid.getZ().getLength());
+        GL11.glScaled(scale / grid.getX().getLength(), scale / grid.getY().getLength(), scale / grid.getZ().getLength());
     }
 
     /**
@@ -213,8 +196,8 @@ public class Renderer {
      * @param grid
      */
     private void transform2D(Grid grid) {
-        glScaled(1.0d / grid.getX().getLength(), 1.0d / grid.getY().getLength(), 1.0d);
-        glTranslated(-grid.getX().getMin(), -grid.getY().getMin(), 0.0d);
+        GL11.glScaled(1.0d / grid.getX().getLength(), 1.0d / grid.getY().getLength(), 1.0d);
+        GL11.glTranslated(-grid.getX().getMin(), -grid.getY().getMin(), 0.0d);
     }
 
     /**
@@ -240,22 +223,11 @@ public class Renderer {
     }
 
     /**
-     * Generate perspective view. Took this from the description here:
-     * https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
+     * the rendering mode, 3D or 2D
      *
-     * @param fovy   - field of view angle, in degrees, in the y direction.
-     * @param aspect - aspect ratio of window
-     * @param zNear  - distance from the viewer to the near clipping plane
-     * @param zFar   - distance from the viewer to the far clipping plane
+     * @author Abd-El-Aziz Zayed
      */
-    private static void perspective(double fovy, double aspect, double zNear, double zFar) {
-        double f = 1.0d / FastMath.tan(fovy * Math.PI / 360d);
-        double transformation[] = { //
-                f / aspect, 0, 0, 0, //
-                0, f, 0, 0, //
-                0, 0, (zFar + zNear) / (zNear - zFar), -1, //
-                0, 0, 2 * zFar * zNear / (zNear - zFar), 0 //
-        };
-        glMultMatrixd(transformation);
+    private enum Mode {
+        RENDER_2D, RENDER_3D
     }
 }

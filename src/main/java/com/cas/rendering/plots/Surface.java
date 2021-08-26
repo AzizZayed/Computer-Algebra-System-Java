@@ -3,20 +3,11 @@ package com.cas.rendering.plots;
 import com.cas.core.Equation;
 import com.cas.rendering.util.Grid;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL15;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBufferData;
 
 /**
  * This class represents a surface: 3 dimensional function with z dependent on x
@@ -31,7 +22,7 @@ public class Surface extends Plot {
     /*
      * the buffer to store the data
      */
-    private static FloatBuffer buffer;
+    private static final FloatBuffer buffer;
 
     static {
         buffer = BufferUtils.createFloatBuffer((MAX_RESOLUTION + 1) * MAX_RESOLUTION * 6);
@@ -77,13 +68,13 @@ public class Surface extends Plot {
 
     @Override
     protected void drawModel() {
-        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        GL15.glPolygonMode(GL15.GL_FRONT_AND_BACK, GL15.GL_LINE);
         int count = MAX_RESOLUTION * 2;
         for (int i = 0; i < MAX_RESOLUTION; i++) {
-            glDrawArrays(GL_TRIANGLE_STRIP, (count + 2) * i, count);
+            GL15.glDrawArrays(GL15.GL_TRIANGLE_STRIP, (count + 2) * i, count);
         }
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        GL15.glPolygonMode(GL15.GL_FRONT_AND_BACK, GL15.GL_FILL);
     }
 
     /**

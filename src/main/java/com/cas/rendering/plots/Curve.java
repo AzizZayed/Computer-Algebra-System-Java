@@ -4,18 +4,11 @@ import com.cas.core.Equation;
 import com.cas.rendering.util.Grid;
 import com.cas.rendering.util.Range;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL15;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-
-import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glBufferSubData;
 
 /**
  * This class represents a curve: 2 dimensional function with y dependent on x
@@ -30,7 +23,7 @@ public class Curve extends Plot {
      * the number of floats needed to represent the data (size) and the buffer to
      * store the data
      */
-    private static FloatBuffer buffer;
+    private static final FloatBuffer buffer;
 
     static {
         buffer = BufferUtils.createFloatBuffer(MAX_RESOLUTION * 2);
@@ -38,9 +31,9 @@ public class Curve extends Plot {
 
     public Curve(Equation eq, BufferedImage image, boolean visible) {
         super(eq, image, 2, visible);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, buffer.capacity() * Float.BYTES, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer.capacity() * Float.BYTES, GL15.GL_DYNAMIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
     @Override
@@ -72,8 +65,8 @@ public class Curve extends Plot {
 
     @Override
     protected void drawModel() {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, buffer);
-        glDrawArrays(GL_LINE_STRIP, 0, MAX_RESOLUTION);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, buffer);
+        GL15.glDrawArrays(GL15.GL_LINE_STRIP, 0, MAX_RESOLUTION);
 //		glDrawArrays(GL_LINES, 0, MAX_RESOLUTION);
 //		glDrawArrays(GL_LINES, 1, MAX_RESOLUTION - 1);
     }

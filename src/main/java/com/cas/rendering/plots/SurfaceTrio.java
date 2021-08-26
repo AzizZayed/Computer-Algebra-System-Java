@@ -18,7 +18,7 @@ public class SurfaceTrio {
     /**
      * The function and it's derivatives
      */
-    private Surface function;
+    private final Surface function;
     private Surface xDerivative;
     private Surface yDerivative;
 

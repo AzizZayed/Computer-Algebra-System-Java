@@ -1,8 +1,6 @@
 package com.cas.main;
 
 import com.cas.rendering.core.Renderer;
-import org.scilab.forge.jlatexmath.TeXConstants;
-import org.scilab.forge.jlatexmath.TeXFormula;
 
 import java.io.IOException;
 
