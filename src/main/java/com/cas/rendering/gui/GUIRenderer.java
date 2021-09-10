@@ -204,7 +204,7 @@ public class GUIRenderer {
         style.setGrabRounding(0f);
         style.setTabRounding(0f);
         ImGui.styleColorsDark();
-        io.setFontGlobalScale(3f);
+        io.setFontGlobalScale(1.2f);
     }
 
     /**
@@ -460,9 +460,9 @@ public class GUIRenderer {
      * @return true if the color edit was edited
      */
     private boolean drawPlotInfo(Plot plot, String checkBoxLabel, String colorEditLabel) {
-        boolean visible = plot.isVisible();
-        ImGui.checkbox(checkBoxLabel, visible);
-        plot.setVisible(visible);
+        if (ImGui.checkbox(checkBoxLabel, plot.isVisible())) {
+            plot.setVisible(!plot.isVisible());
+        }
         boolean mod = ImGui.colorEdit4(colorEditLabel, plot.getColor(), ImGuiColorEditFlags.Float);
         Texture tex = plot.getTexture();
         ImGui.image(tex.getID(), tex.getWidth(), tex.getHeight());

@@ -18,9 +18,9 @@ public final class Display {
     /**
      * position of the viewport
      */
-    public static final int xViewport = 500;
+    public static final int xViewport = 400;
     public static final int yViewport = 0;
-    public static final int renderWidth = 1500;
+    public static final int renderWidth = 1000;
     public static final int renderHeight = 1000;
     public static final int width = renderWidth + xViewport;
     public static final int height = renderHeight + yViewport;

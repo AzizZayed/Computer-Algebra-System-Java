@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
  */
 public class LatexRenderer {
 
-    public static int textSize = 20; // the size of the LaTeX text
+    public static int textSize = 30; // the size of the LaTeX text
 
     public static BufferedImage toImage(Equation eq, String prefix, String postfix) {
         return toImage(prefix + eq.toLatex() + postfix);
